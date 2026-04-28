@@ -12,13 +12,14 @@ const app = express();
 
 // Enable CORS for development
 app.use(
-  cors(
-  ));
+  cors({
+    origin : "http://localhost:5173"
+  }));
 
 app.use(express.json());
 app.use("/api/users", userRoute);
 app.use("/api/products", productRoute);
-// app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static('uploads'));
 
 
 

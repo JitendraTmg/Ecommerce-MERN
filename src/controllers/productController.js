@@ -3,9 +3,9 @@ import Product from '../models/productModel.js';
 // Create Product
 export const createProduct = async (req, res) => {
     try {
-        const { productName, productImage, productPrice, productDescription, category, rating } = req.body;
-        // const { productName, productPrice, productDescription, category, rating } = req.body;
-        // const productImage = req.file ? req.file.path : null;
+        // const { productName, productImage, productPrice, productDescription, category, rating } = req.body;
+        const { productName, productPrice, productDescription, category, rating } = req.body;
+        const productImage = req.file ? req.file.path : null;
 
         if (!productName || !productImage || !productPrice || !productDescription || !category) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
