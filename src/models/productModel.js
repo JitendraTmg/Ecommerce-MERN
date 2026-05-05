@@ -27,7 +27,7 @@ const productSchema = new mongoose.Schema({
         max: 5,
         default: 0,
     },
-}, { timestamps: true });
+}, { timestamps: true });// Add timestamps to automatically manage createdAt and updatedAt fields
 
 const Product = mongoose.model('Product', productSchema);
 
