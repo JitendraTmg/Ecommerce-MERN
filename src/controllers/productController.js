@@ -54,7 +54,18 @@ export const getProductById = async (req, res) => {
 // Update Product
 export const updateProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updateData = { ...req.body };
+        
+        // If file is uploaded, add it to updateData
+        if (req.file) {
+            updateData.productImage = req.file.path;
+        }
+
+        const product = await Product.findByIdAndUpdate(
+            req.params.id, 
+            updateData, 
+            { new: true }
+        );
 
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });

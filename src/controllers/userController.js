@@ -6,7 +6,7 @@ import User from '../models/userModel.js';
 
 export const signUp = async (req, res) => {
     try {
-        const { firstName, lastName, email, password,phoneNumber} = req.body;
+        const { firstName, lastName, email, password, phoneNumber } = req.body;
 
         if (!firstName || !lastName || !email || !password || !phoneNumber) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
@@ -23,15 +23,44 @@ export const signUp = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({ firstName, lastName, email, password: hashedPassword, phoneNumber });
+        const newUser = new User({ 
+            firstName, 
+            lastName, 
+            email, 
+            password: hashedPassword, 
+            phoneNumber 
+        });
 
         const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, { expiresIn: '10min' });
-        verifyEmail(token, email); //send email here
-        newUser.token = token;
+        
+        // ✅ Debug logging
+        console.log('🔐 MAIL_USER:', process.env.MAIL_USER);
+        console.log('🔑 MAIL_PASS exists:', !!process.env.MAIL_PASS);
+        
+        try {
+            console.log('📧 Sending verification email to:', email);
+            await verifyEmail(token, email);
+            console.log('✅ Verification email sent successfully');
+        } catch (emailError) {
+            console.error('❌ Email sending failed:', {
+                message: emailError.message,
+                code: emailError.code,
+                fullError: emailError
+            });
+            return res.status(500).json({ 
+                success: false, 
+                message: `Failed to send verification email: ${emailError.message}` 
+            });
+        }
 
+        newUser.token = token;
         await newUser.save();
 
-        return res.status(201).json({ success: true, message: 'User registered successfully', user: newUser });
+        return res.status(201).json({ 
+            success: true, 
+            message: 'User registered successfully. Please check your email to verify.',
+            user: newUser 
+        });
 
     } catch (error) {
         console.error('Error in signUp:', error);
